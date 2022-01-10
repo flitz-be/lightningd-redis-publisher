@@ -22,9 +22,9 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
             - name: Build
-              run: CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o main
+              run: CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"'
             - name: Create a release
               uses: ncipollo/release-action@v1
               with:
-                artifacts: "main"
+                artifacts: ${{ github.event.repository.name }}
                 token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
