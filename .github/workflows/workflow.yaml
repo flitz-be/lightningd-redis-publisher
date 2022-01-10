@@ -1,0 +1,30 @@
+name: Build Golang
+on:
+  push:
+    tags:
+    - '*'
+jobs:
+    build:
+        strategy:
+          matrix:
+            go-version: [ 1.15.x ]
+            platform: [ ubuntu-latest ]
+        runs-on: ${{ matrix.platform }}
+        steps:
+            - name: Configure git for private modules
+              env:
+                TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+              run: git config --global url."https://${USERNAME}:${TOKEN}@github.com".insteadOf "https://github.com"
+            - name: Install Go
+              uses: actions/setup-go@v1
+              with:
+                go-version: ${{ matrix.go-version }}
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Build
+              run: CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o main
+            - name: Create a release
+              uses: ncipollo/release-action@v1
+              with:
+                artifacts: "main"
+                token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
